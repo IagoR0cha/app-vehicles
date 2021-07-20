@@ -9,6 +9,7 @@ class HomePage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   String? _automakerNameCurrent;
+  String? _automakerNameEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +41,91 @@ class HomePage extends StatelessWidget {
                   height: 100,
                   child: Row(children: [
                     const SizedBox(width: 15),
-                    Expanded(child: Text(
+                    Expanded(
+                      child: Text(
                       automakersController.automakers[index].name,
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: 20,
                         letterSpacing: 2
+                      ))
+                    ),
+                    TextButton(
+                      child: const Text('Editar', style: TextStyle(color: Colors.white),),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue,
                       ),
-                    ))
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              actions: [
+                                Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Editar Montadora",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: TextFormField(
+                                          decoration: InputDecoration(labelText: 'Name'),
+                                          onSaved: (value) {
+                                            _automakerNameEdit = value;
+                                          },
+                                        )
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            _formKey.currentState!.save();
+                                            await automakersController.edit(
+                                              automakersController.automakers[index].id,
+                                              _automakerNameEdit!,
+                                            );
+                                            ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                content: Text(
+                                                  'Salvo com sucesso!'
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Text('Editar Montadora'),
+                                        ),
+                                      )
+                                    ]
+                                  ),
+                                )
+                              ],
+                            );
+                          }
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 5),
+                    TextButton(
+                      child: const Text('Deletar', style: TextStyle(color: Colors.white),),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () async {
+                        await automakersController.delete(automakersController.automakers[index].id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Montadora deletada!'))
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 15),
                   ],),
                 ),
               ),

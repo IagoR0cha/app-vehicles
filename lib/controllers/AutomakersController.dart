@@ -44,12 +44,33 @@ class AutomakersController extends ChangeNotifier {
   }
 
   Future<void> create(String? automakerName) async {
-    print(automakerName);
     var url = Uri.https(Env.FIREBASE_URL, '/automakers.json');
 
     await http.post(url, body: jsonEncode({ 'name': automakerName }));
 
     index();
     notifyListeners();
+  }
+
+  Future<void> delete(String automakerId) async {
+    var url = Uri.https(Env.FIREBASE_URL, '/automakers/$automakerId.json');
+
+    try{
+      await http.delete(url);
+      index();
+      notifyListeners();
+    } catch(e) {
+    }
+  }
+
+  Future<void> edit(String automakerId, String rename) async {
+    var url = Uri.https(Env.FIREBASE_URL, '/automakers/$automakerId.json');
+
+    try {
+      await http.put(url, body: jsonEncode({'name': rename}));
+      index();
+      notifyListeners();
+    }catch(e) {
+    }
   }
 }
